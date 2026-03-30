@@ -5,7 +5,8 @@ import com.girlsafety.model.User;
 import com.girlsafety.repository.EmergencyContactRepository;
 import com.girlsafety.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-
+import com.girlsafety.service.ContactService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ public class EmergencyContactController {
 
     private final EmergencyContactRepository contactRepository;
     private final UserRepository userRepository;
+    private final ContactService contactService;
 
     // ✅ ADD CONTACT
     @PostMapping
@@ -58,4 +60,24 @@ public class EmergencyContactController {
 
         return contactRepository.findByUser(user);
     }
+  @DeleteMapping("/{id}")
+public ResponseEntity<?> deleteContact(@PathVariable Long id,
+                                       Authentication authentication) {
+
+    String email = authentication.getName();
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    EmergencyContact contact = contactRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Contact not found"));
+
+    if (!contact.getUser().getId().equals(user.getId())) {
+        return ResponseEntity.status(403).body("Unauthorized ❌");
+    }
+
+    contactRepository.delete(contact);
+
+    return ResponseEntity.ok("Deleted successfully ✅");
+}
 }

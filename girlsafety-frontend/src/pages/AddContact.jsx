@@ -11,68 +11,78 @@ export default function AddContact() {
 
   const navigate = useNavigate();
 
-  const handleAdd = async () => {
+  const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
+
+      console.log("TOKEN:", token); // 🔥 debug
+
+      if (!token) {
+        alert("Please login first ❌");
+        return;
+      }
 
       await API.post(
         "/contacts",
         contact,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // ✅ IMPORTANT
           },
         }
       );
 
-      alert("Contact added successfully ✅");
-      navigate("/dashboard");
+      alert("Contact Added ✅");
+      navigate("/contacts");
+
     } catch (error) {
-      alert("Failed to add contact ❌");
       console.error(error);
+
+      if (error.response?.status === 403) {
+        alert("Unauthorized ❌ Please login again");
+      } else {
+        alert("Failed to add contact ❌");
+      }
     }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Add Emergency Contact</h2>
+    <div className="container">
+      <div className="card">
+        <h2>➕ Add Contact</h2>
 
-      <input
-        type="text"
-        placeholder="Name"
-        onChange={(e) =>
-          setContact({ ...contact, name: e.target.value })
-        }
-      />
-      <br /><br />
+        <input
+          placeholder="Name"
+          value={contact.name}
+          onChange={(e) =>
+            setContact({ ...contact, name: e.target.value })
+          }
+        />
 
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) =>
-          setContact({ ...contact, email: e.target.value })
-        }
-      />
-      <br /><br />
+        <input
+          placeholder="Email"
+          value={contact.email}
+          onChange={(e) =>
+            setContact({ ...contact, email: e.target.value })
+          }
+        />
 
-      <input
-        type="text"
-        placeholder="Phone"
-        onChange={(e) =>
-          setContact({ ...contact, phone: e.target.value })
-        }
-      />
-      <br /><br />
+        <input
+          placeholder="Phone"
+          value={contact.phone}
+          onChange={(e) =>
+            setContact({ ...contact, phone: e.target.value })
+          }
+        />
 
-      <button onClick={handleAdd}>
-        ➕ Add Contact
-      </button>
+        <button onClick={handleSubmit}>
+          Save Contact
+        </button>
 
-      <br /><br />
-
-      <button onClick={() => navigate("/dashboard")}>
-        ⬅ Back
-      </button>
+        <p onClick={() => navigate("/dashboard")}>
+          ⬅ Back
+        </p>
+      </div>
     </div>
   );
 }

@@ -7,11 +7,12 @@ export default function ForgotPassword() {
   const handleSubmit = async () => {
   try {
     await API.post("/auth/forgot-password", { email });
+
     alert("Reset link sent 📩");
   } catch (err) {
-    console.error(err);
-    alert("Error ❌");
-  }
+  console.error("ERROR:", err.response?.data); // ✅ ADD THIS
+  alert(err.response?.data || "Error ❌");
+}
 };
   return (
     <div style={styles.container}>

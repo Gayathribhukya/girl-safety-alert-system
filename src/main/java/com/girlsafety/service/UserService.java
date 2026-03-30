@@ -3,7 +3,9 @@ package com.girlsafety.service;
 import com.girlsafety.dto.RegisterRequest;
 import com.girlsafety.model.User;
 import com.girlsafety.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,41 +23,54 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
 
-    // ================= REGISTER =================
-
+    // ✅ REGISTER
     public String register(RegisterRequest request) {
 
-    // 🔴 CHECK EMAIL EXISTS
-    if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-        throw new RuntimeException("Email already registered");
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already registered ❌");
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role("USER")
+                .build();
+
+        userRepository.save(user);
+
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(user.getEmail());
+
+        return jwtService.generateToken(userDetails);
     }
 
-  User user = User.builder()
-        .email(request.getEmail())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .role("USER")
-        .build();
-    userRepository.save(user);
-
-    UserDetails userDetails =
-            userDetailsService.loadUserByUsername(user.getEmail());
-
-    return jwtService.generateToken(userDetails);
-}
-    // ================= LOGIN =================
-
+    // ✅ LOGIN
     public String login(String email, String password) {
 
-    try {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
-    } catch (Exception e) {
-        throw new RuntimeException("Invalid email or password: " + e.getMessage());
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid email or password ❌");
+        }
+
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(email);
+
+        return jwtService.generateToken(userDetails);
     }
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    // ✅ UPDATE PASSWORD (USED IN RESET)
+    public void updatePassword(String email, String newPassword) {
 
-    return jwtService.generateToken(userDetails);
-}
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found ❌"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(user);
+
+        System.out.println("PASSWORD UPDATED SUCCESSFULLY");
+    }
 }

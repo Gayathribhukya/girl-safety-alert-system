@@ -3,59 +3,52 @@ import API from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-  const [data, setData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [data, setData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
   const handleRegister = async () => {
-    try {
-      await API.post("/auth/register", data);
+  try {
+    await API.post("/auth/register", data);
 
-      alert("Registration Successful ✅");
+    alert("Registered Successfully ✅");
+    navigate("/");
 
-      navigate("/");
-    } catch (error) {
-      alert("Registration Failed ❌");
-      console.error(error);
+  } catch (error) {
+    console.error(error);
+
+    if (error.response) {
+      alert("User already exists ❌");
+    } else {
+      alert("Server error ❌");
     }
-  };
+  }
+};
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h2>Register</h2>
+    <div className="container">
+      <div className="card">
+        <h2>📝 Register</h2>
 
-      <input
-        type="email"
-        placeholder="Enter Email"
-        onChange={(e) =>
-          setData({ ...data, email: e.target.value })
-        }
-      />
-      <br /><br />
+        <input
+          type="email"
+          placeholder="Email"
+          onChange={(e) =>
+            setData({ ...data, email: e.target.value })
+          }
+        />
 
-      <input
-        type="password"
-        placeholder="Enter Password"
-        onChange={(e) =>
-          setData({ ...data, password: e.target.value })
-        }
-      />
-      <br /><br />
+        <input
+          type="password"
+          placeholder="Password"
+          onChange={(e) =>
+            setData({ ...data, password: e.target.value })
+          }
+        />
 
-      <button onClick={handleRegister}>Register</button>
+        <button onClick={handleRegister}>Register</button>
 
-      <p>
-        Already have an account?{" "}
-        <span
-          style={{ color: "blue", cursor: "pointer" }}
-          onClick={() => navigate("/")}
-        >
-          Login
-        </span>
-      </p>
+        <p onClick={() => navigate("/")}>Back to Login</p>
+      </div>
     </div>
   );
 }

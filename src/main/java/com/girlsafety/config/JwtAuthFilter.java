@@ -22,56 +22,60 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-
-    @Override
+@Override
 protected void doFilterInternal(HttpServletRequest request,
                                 HttpServletResponse response,
                                 FilterChain filterChain)
         throws ServletException, IOException {
 
-    String path = request.getServletPath();
-    System.out.println("PATH = " + path);
+    String path = request.getRequestURI();
 
-    // Skip authentication endpoints
-    if (path.startsWith("/api/auth")) {
+    System.out.println("FILTER PATH: " + path);
+
+    // ✅ Skip auth endpoints
+    if (path.contains("/api/auth/")) {
         filterChain.doFilter(request, response);
         return;
     }
 
     final String authHeader = request.getHeader("Authorization");
-    final String jwt;
-    final String userEmail;
 
+    // ✅ If no token → just continue (DO NOT BLOCK)
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
         filterChain.doFilter(request, response);
         return;
     }
 
-    jwt = authHeader.substring(7);
-    userEmail = jwtService.extractUsername(jwt);
-    System.out.println("JWT Email = " + userEmail);
+    try {
+        String jwt = authHeader.substring(7);
+        String userEmail = jwtService.extractUsername(jwt);
 
-    if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (userEmail != null &&
+            SecurityContextHolder.getContext().getAuthentication() == null) {
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+            UserDetails userDetails =
+                    userDetailsService.loadUserByUsername(userEmail);
 
-        if (jwtService.isTokenValid(jwt, userDetails)) {
-            System.out.println("TOKEN IS VALID");
+            if (jwtService.isTokenValid(jwt, userDetails)) {
 
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
 
-            authToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
 
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-            System.out.println("AUTHENTICATION SET IN SECURITY CONTEXT");
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
         }
+
+    } catch (Exception e) {
+        System.out.println("JWT ERROR: " + e.getMessage());
+        // ❗ DO NOT BLOCK REQUEST
     }
 
     filterChain.doFilter(request, response);
