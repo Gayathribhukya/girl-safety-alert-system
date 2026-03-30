@@ -57,12 +57,13 @@ public class SecurityConfig {
             .cors(cors -> {}) // ✅ FIXES CORS ERROR
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/contacts/**").authenticated()
-                .requestMatchers("/api/alerts/**").authenticated()
-                .requestMatchers("/api/location/**").authenticated()
-                .anyRequest().authenticated()
-            )
+    .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // ✅ IMPORTANT
+    .requestMatchers("/api/auth/**").permitAll()
+    .requestMatchers("/api/contacts/**").authenticated()
+    .requestMatchers("/api/alerts/**").authenticated()
+    .requestMatchers("/api/location/**").authenticated()
+    .anyRequest().authenticated()
+)
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
@@ -74,21 +75,25 @@ public class SecurityConfig {
 
     // 🌐 CORS CONFIGURATION (VERY IMPORTANT)
     @Bean
-    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
 
-        org.springframework.web.cors.CorsConfiguration config =
-                new org.springframework.web.cors.CorsConfiguration();
+    org.springframework.web.cors.CorsConfiguration config =
+            new org.springframework.web.cors.CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // frontend URL
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+    config.setAllowedOrigins(List.of(
+        "http://localhost:5173",
+        "https://girl-safety-alert-system.vercel.app"
+    ));
 
-        org.springframework.web.cors.UrlBasedCorsConfigurationSource source =
-                new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    config.setAllowedHeaders(List.of("*"));
+    config.setAllowCredentials(true);
 
-        source.registerCorsConfiguration("/**", config);
+    org.springframework.web.cors.UrlBasedCorsConfigurationSource source =
+            new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
 
-        return source;
-    }
+    source.registerCorsConfiguration("/**", config);
+
+    return source;
+}
 }
