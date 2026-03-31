@@ -167,6 +167,7 @@ const card = {
   backdropFilter: "blur(10px)",
   color: "#fff",
   boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
+  transition: "0.3s",
 };
 
 const smallBtn = {
@@ -196,6 +197,7 @@ const addBtn = {
   color: "white",
   fontSize: "16px",
   cursor: "pointer",
+  transition: "0.3s",
 };
 
 const sosBtn = {

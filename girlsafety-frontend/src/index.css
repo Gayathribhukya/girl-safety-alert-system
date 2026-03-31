@@ -20,6 +20,11 @@ button:hover {
   transition: 0.3s;
 }
 
+button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
 /* Layout */
 .container {
   display: flex;
@@ -99,4 +104,7 @@ span, p {
 
 span:hover, p:hover {
   text-decoration: underline;
+}
+div:hover {
+  transform: translateY(-5px);
 }
