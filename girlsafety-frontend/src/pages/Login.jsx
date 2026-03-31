@@ -33,7 +33,19 @@ export default function Login() {
   }
 };
   return (
-    <div style={container}>
+  <div style={mainContainer}>
+
+    {/* 🔥 LEFT SIDE MENU */}
+    <div style={leftPanel}>
+      <h2 style={{ color: "#fff" }}>🚨 Safety App</h2>
+
+      <button style={menuBtn} onClick={() => navigate("/")}>Home</button>
+      <button style={menuBtn} onClick={() => navigate("/about")}>About</button>
+      <button style={menuBtn} onClick={() => navigate("/contact")}>Contact</button>
+    </div>
+
+    {/* 🔥 RIGHT SIDE LOGIN */}
+    <div style={rightPanel}>
       <div style={card}>
         <h2 style={{ color: "#fff", marginBottom: "20px" }}>
           🔐 Welcome Back
@@ -56,7 +68,7 @@ export default function Login() {
         />
 
         <button style={btn} onClick={login} disabled={loading}>
-        {loading ? "Loading..." : "Login"}
+          {loading ? "Loading..." : "Login"}
         </button>
 
         {error && (
@@ -74,17 +86,12 @@ export default function Login() {
         </p>
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 /* 🎨 STYLES */
 
-const container = {
-  minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
 
 const card = {
   width: "320px",
@@ -120,4 +127,37 @@ const link = {
   color: "#c7d2fe",
   cursor: "pointer",
   marginTop: "10px",
+};
+const mainContainer = {
+  display: "flex",
+  minHeight: "100vh",
+};
+
+const leftPanel = {
+  width: "30%",
+  background: "linear-gradient(180deg, #1e293b, #0f172a)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "20px",
+};
+
+const rightPanel = {
+  width: "70%",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: "linear-gradient(135deg, #0f172a, #1e3a8a)",
+};
+
+const menuBtn = {
+  width: "150px",
+  padding: "12px",
+  borderRadius: "10px",
+  border: "none",
+  background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
+  color: "white",
+  cursor: "pointer",
+  transition: "0.3s",
 };
