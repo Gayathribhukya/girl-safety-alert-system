@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -13,28 +13,12 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  // ✅ STEP 1: FUNCTION FIRST
- const fetchContactsCount = useCallback(async () => {
-  try {
-    const token = localStorage.getItem("token");
+  // ✅ FETCH CONTACT COUNT
 
-    const res = await API.get("/contacts/my", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
 
-    const contacts = Array.isArray(res.data) ? res.data : [];
-    setContactCount(contacts.length);
-
-  } catch (error) {
-    console.error(error);
-  }
-}, []);
-
-  // ✅ STEP 2: useEffect AFTER FUNCTION
-// eslint-disable-next-line react-hooks/exhaustive-deps
-useEffect(() => {
+  // ✅ GET LOCATION + FETCH CONTACTS
+  useEffect(() => {
+  // 📍 GET LOCATION
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       setLocation({
@@ -47,9 +31,29 @@ useEffect(() => {
     }
   );
 
+  // 📇 FETCH CONTACTS
+  const fetchContactsCount = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await API.get("/contacts/my", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const contacts = Array.isArray(res.data) ? res.data : [];
+      setContactCount(contacts.length);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   fetchContactsCount();
 
 }, []);
+
   // 🚨 SEND SOS
   const sendSOS = async () => {
     if (!location.latitude || !location.longitude) {
@@ -115,17 +119,21 @@ useEffect(() => {
       </div>
 
       {/* 🔥 ACTION BUTTONS */}
-      <button style={addBtn} onClick={() => navigate("/add-contact")}>
-        ➕ Add Contact
-      </button>
+      <div style={btnContainer}>
 
-      <button style={sosBtn} onClick={sendSOS}>
-        🚨 Send SOS
-      </button>
+        <button style={addBtn} onClick={() => navigate("/add-contact")}>
+          ➕ Add Contact
+        </button>
 
-      <button style={logoutBtn} onClick={logout}>
-        Logout
-      </button>
+        <button style={sosBtn} onClick={sendSOS}>
+          🚨 Send SOS
+        </button>
+
+        <button style={logoutBtn} onClick={logout}>
+          Logout
+        </button>
+
+      </div>
     </div>
   );
 }
@@ -171,9 +179,16 @@ const smallBtn = {
   cursor: "pointer",
 };
 
-const addBtn = {
+const btnContainer = {
   marginTop: "30px",
-  width: "60%",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: "15px",
+};
+
+const addBtn = {
+  width: "50%",
   padding: "15px",
   borderRadius: "12px",
   border: "none",
@@ -184,8 +199,7 @@ const addBtn = {
 };
 
 const sosBtn = {
-  marginTop: "20px",
-  width: "60%",
+  width: "50%",
   padding: "15px",
   borderRadius: "12px",
   border: "none",
@@ -196,8 +210,7 @@ const sosBtn = {
 };
 
 const logoutBtn = {
-  marginTop: "20px",
-  width: "40%",
+  width: "50%",
   padding: "12px",
   borderRadius: "10px",
   border: "none",
