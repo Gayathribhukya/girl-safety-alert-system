@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useCallback } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+
   const [location, setLocation] = useState({
     latitude: null,
     longitude: null,
@@ -13,8 +13,8 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  // ✅ FUNCTION FIRST
-  const fetchContactsCount = async () => {
+  // ✅ STEP 1: FUNCTION FIRST
+ const fetchContactsCount = useCallback(async () => {
   try {
     const token = localStorage.getItem("token");
 
@@ -30,11 +30,10 @@ export default function Dashboard() {
   } catch (error) {
     console.error(error);
   }
-};
-  
+}, []);
 
-  // ✅ SINGLE useEffect
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // ✅ STEP 2: useEffect AFTER FUNCTION
+// eslint-disable-next-line react-hooks/exhaustive-deps
 useEffect(() => {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
@@ -43,15 +42,15 @@ useEffect(() => {
         longitude: pos.coords.longitude,
       });
     },
-    (err) => {
-      console.error(err);
+    () => {
       alert("Location access denied ❌");
     }
   );
 
-  fetchContactsCount(); // ✅ no warning now
+  fetchContactsCount();
+
 }, []);
-  // 🚨 Send SOS
+  // 🚨 SEND SOS
   const sendSOS = async () => {
     if (!location.latitude || !location.longitude) {
       alert("Location not ready ❌");
@@ -81,47 +80,54 @@ useEffect(() => {
     }
   };
 
-  // 🚪 Logout
+  // 🚪 LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
 
   return (
-  <div style={container}>
-    <h1 style={title}>Dashboard</h1>
+    <div style={container}>
+      <h1 style={title}>Dashboard</h1>
 
-    <div style={cardContainer}>
-      {/* Status Card */}
-      <div style={card}>
-        <div style={icon}>📍</div>
-        <h3>Ready ✅</h3>
+      {/* 🔥 CARDS */}
+      <div style={cardContainer}>
+        {/* 📍 LOCATION */}
+        <div style={card}>
+          <h3>📍 Location</h3>
+          <p>
+            {location.latitude ? "Ready ✅" : "Fetching location..."}
+          </p>
+        </div>
+
+        {/* 📇 CONTACTS */}
+        <div style={card}>
+          <h3>📇 Contacts</h3>
+          <p>{contactCount} Saved</p>
+
+          <button
+            style={smallBtn}
+            onClick={() => navigate("/manage-contacts")}
+          >
+            Manage
+          </button>
+        </div>
       </div>
 
-      {/* Contacts Card */}
-      <div style={card}>
-        <div style={icon}>📇</div>
-        <h3>{contactCount} Saved</h3>
-        <button style={smallBtn} onClick={() => navigate("/manage-contacts")}>
-          Manage Contacts
-        </button>
-      </div>
+      {/* 🔥 ACTION BUTTONS */}
+      <button style={addBtn} onClick={() => navigate("/add-contact")}>
+        ➕ Add Contact
+      </button>
+
+      <button style={sosBtn} onClick={sendSOS}>
+        🚨 Send SOS
+      </button>
+
+      <button style={logoutBtn} onClick={logout}>
+        Logout
+      </button>
     </div>
-
-    {/* Buttons */}
-    <button style={addBtn} onClick={() => navigate("/add-contact")}>
-      ➕ Add Contact
-    </button>
-
-   <button style={sosBtn} onClick={sendSOS}>
-  🚨 Send SOS
-</button>
-
-    <button style={logoutBtn} onClick={logout}>
-  Logout
-</button>
-  </div>
-);
+  );
 }
 
 /* 🎨 STYLES */
@@ -135,7 +141,7 @@ const container = {
 
 const title = {
   color: "#fff",
-  marginBottom: "40px",
+  marginBottom: "30px",
 };
 
 const cardContainer = {
@@ -153,12 +159,6 @@ const card = {
   backdropFilter: "blur(10px)",
   color: "#fff",
   boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
-  transition: "0.3s",
-};
-
-const icon = {
-  fontSize: "30px",
-  marginBottom: "10px",
 };
 
 const smallBtn = {
@@ -172,7 +172,7 @@ const smallBtn = {
 };
 
 const addBtn = {
-  marginTop: "40px",
+  marginTop: "30px",
   width: "60%",
   padding: "15px",
   borderRadius: "12px",

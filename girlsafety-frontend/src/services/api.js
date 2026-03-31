@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://girl-safety-alert-system.onrender.com/api",
+  baseURL: "https://girl-safety-alert-system.onrender.com/api"
 });
 
 API.interceptors.request.use((req) => {

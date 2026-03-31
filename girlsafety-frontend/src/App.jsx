@@ -26,13 +26,25 @@ function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ textAlign: "center", marginBottom: "20px" }}>
-      <button style={navBtn} onClick={() => navigate("/")}>Home</button>
-      <button style={navBtn} onClick={() => navigate("/about")}>About</button>
-      <button style={navBtn} onClick={() => navigate("/contact")}>Contact</button>
+    <div style={nav}>
+      <h3 style={{ color: "#fff" }}>🚨 Safety App</h3>
+
+      <div>
+        <button style={navBtn} onClick={() => navigate("/")}>Home</button>
+        <button style={navBtn} onClick={() => navigate("/about")}>About</button>
+        <button style={navBtn} onClick={() => navigate("/contact")}>Contact</button>
+      </div>
     </div>
   );
 }
+
+const nav = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "15px 40px",
+  background: "rgba(255,255,255,0.1)",
+  backdropFilter: "blur(10px)",
+};
 
 // 🔥 MAIN APP
 function App() {
