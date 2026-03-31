@@ -131,10 +131,11 @@ const link = {
 const mainContainer = {
   display: "flex",
   minHeight: "100vh",
+  borderRight: "1px solid rgba(255,255,255,0.1)",
 };
 
 const leftPanel = {
-  width: "30%",
+  width: "35%",
   background: "linear-gradient(180deg, #1e293b, #0f172a)",
   display: "flex",
   flexDirection: "column",
