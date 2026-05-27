@@ -4,64 +4,94 @@ import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
 
+  // 📍 LOCATION STATE
   const [location, setLocation] = useState({
     latitude: null,
     longitude: null,
   });
 
+  // 📇 CONTACT COUNT
   const [contactCount, setContactCount] = useState(0);
+
+  // 🧠 RISK LEVEL
+  const [riskLevel, setRiskLevel] = useState("");
 
   const navigate = useNavigate();
 
-  // ✅ FETCH CONTACT COUNT
+  // 🧠 AI RISK DETECTION
+  const detectRisk = () => {
+    const hour = new Date().getHours();
 
+    if (hour >= 22 || hour <= 5) return "HIGH";
+    if (hour >= 18) return "MEDIUM";
 
-  // ✅ GET LOCATION + FETCH CONTACTS
-  useEffect(() => {
-  // 📍 GET LOCATION
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      setLocation({
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-      });
-    },
-    () => {
-      alert("Location access denied ❌");
-    }
-  );
-
-  // 📇 FETCH CONTACTS
-  const fetchContactsCount = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await API.get("/contacts/my", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const contacts = Array.isArray(res.data) ? res.data : [];
-      setContactCount(contacts.length);
-
-    } catch (error) {
-      console.error(error);
-    }
+    return "LOW";
   };
 
-  fetchContactsCount();
+  // 🎨 RISK COLORS
+  const getRiskColor = (level) => {
+    if (level === "HIGH") return "#ef4444";
+    if (level === "MEDIUM") return "#facc15";
 
-}, []);
+    return "#22c55e";
+  };
+
+  // 🚀 LOAD DATA
+  useEffect(() => {
+
+    // 📍 GET LOCATION
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        });
+      },
+      () => {
+        alert("Location access denied ❌");
+      }
+    );
+
+    // 🧠 SET RISK LEVEL
+    setRiskLevel(detectRisk());
+
+    // 📇 FETCH CONTACT COUNT
+    const fetchContactsCount = async () => {
+      try {
+
+        const token = localStorage.getItem("token");
+
+        const res = await API.get("/contacts/my", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const contacts = Array.isArray(res.data)
+          ? res.data
+          : [];
+
+        setContactCount(contacts.length);
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchContactsCount();
+
+  }, []);
 
   // 🚨 SEND SOS
   const sendSOS = async () => {
+
     if (!location.latitude || !location.longitude) {
       alert("Location not ready ❌");
       return;
     }
 
     try {
+
       const token = localStorage.getItem("token");
 
       await API.post(
@@ -78,6 +108,7 @@ export default function Dashboard() {
       );
 
       alert("🚨 SOS Sent Successfully!");
+
     } catch (error) {
       console.error(error);
       alert("Failed to send SOS ❌");
@@ -92,21 +123,35 @@ export default function Dashboard() {
 
   return (
     <div style={container}>
+
       <h1 style={title}>Dashboard</h1>
 
-      {/* 🔥 CARDS */}
+      {/* 🧠 RISK LEVEL */}
+      <h3 style={{ color: "#fff" }}>
+        ⚠️ Risk Level:
+        <span style={{ color: getRiskColor(riskLevel) }}>
+          {" "}{riskLevel}
+        </span>
+      </h3>
+
+      {/* 📦 CARDS */}
       <div style={cardContainer}>
+
         {/* 📍 LOCATION */}
         <div style={card}>
           <h3>📍 Location</h3>
+
           <p>
-            {location.latitude ? "Ready ✅" : "Fetching location..."}
+            {location.latitude
+              ? "Ready ✅"
+              : "Fetching..."}
           </p>
         </div>
 
         {/* 📇 CONTACTS */}
         <div style={card}>
           <h3>📇 Contacts</h3>
+
           <p>{contactCount} Saved</p>
 
           <button
@@ -116,24 +161,35 @@ export default function Dashboard() {
             Manage
           </button>
         </div>
+
       </div>
 
-      {/* 🔥 ACTION BUTTONS */}
+      {/* 🔘 BUTTONS */}
       <div style={btnContainer}>
 
-        <button style={addBtn} onClick={() => navigate("/add-contact")}>
+        <button
+          style={addBtn}
+          onClick={() => navigate("/add-contact")}
+        >
           ➕ Add Contact
         </button>
 
-        <button style={sosBtn} onClick={sendSOS}>
+        <button
+          style={sosBtn}
+          onClick={sendSOS}
+        >
           🚨 Send SOS
         </button>
 
-        <button style={logoutBtn} onClick={logout}>
+        <button
+          style={logoutBtn}
+          onClick={logout}
+        >
           Logout
         </button>
 
       </div>
+
     </div>
   );
 }
@@ -149,7 +205,7 @@ const container = {
 
 const title = {
   color: "#fff",
-  marginBottom: "30px",
+  marginBottom: "20px",
 };
 
 const cardContainer = {
@@ -161,13 +217,10 @@ const cardContainer = {
 
 const card = {
   width: "220px",
-  padding: "25px",
+  padding: "20px",
   borderRadius: "20px",
   background: "rgba(255,255,255,0.1)",
-  backdropFilter: "blur(10px)",
   color: "#fff",
-  boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
-  transition: "0.3s",
 };
 
 const smallBtn = {
@@ -184,39 +237,36 @@ const btnContainer = {
   marginTop: "30px",
   display: "flex",
   flexDirection: "column",
-  alignItems: "center",
   gap: "15px",
+  alignItems: "center",
 };
 
 const addBtn = {
   width: "50%",
-  padding: "15px",
-  borderRadius: "12px",
+  padding: "12px",
+  background: "#6366f1",
+  color: "#fff",
   border: "none",
-  background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
-  color: "white",
-  fontSize: "16px",
+  borderRadius: "10px",
   cursor: "pointer",
-  transition: "0.3s",
 };
 
 const sosBtn = {
   width: "50%",
-  padding: "15px",
-  borderRadius: "12px",
+  padding: "12px",
+  background: "#ef4444",
+  color: "#fff",
   border: "none",
-  background: "linear-gradient(90deg, #ef4444, #dc2626)",
-  color: "white",
-  fontSize: "16px",
+  borderRadius: "10px",
   cursor: "pointer",
 };
 
 const logoutBtn = {
   width: "50%",
   padding: "12px",
-  borderRadius: "10px",
-  border: "none",
   background: "#334155",
-  color: "white",
+  color: "#fff",
+  border: "none",
+  borderRadius: "10px",
   cursor: "pointer",
 };
