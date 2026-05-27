@@ -54,7 +54,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            .cors(cors -> {}) // ✅ FIXES CORS ERROR
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
     .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // ✅ IMPORTANT
@@ -81,10 +81,10 @@ public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSou
             new org.springframework.web.cors.CorsConfiguration();
 
     config.setAllowedOrigins(List.of(
-        "http://localhost:5173",
-        "https://girl-safety-alert-system.vercel.app"
-    ));
-
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://girl-safety-alert-system.vercel.app"
+));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);

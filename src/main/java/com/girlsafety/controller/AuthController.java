@@ -18,6 +18,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = {
+    "http://localhost:5173",
+    "http://localhost:5174"
+})
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -26,7 +30,7 @@ public class AuthController {
 
     private static final String SECRET_KEY = "mysecretkeymysecretkeymysecretkey12345";
 
-    // ✅ REGISTER
+    // REGISTER
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
@@ -36,7 +40,7 @@ public class AuthController {
         }
     }
 
-    // ✅ LOGIN
+    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
@@ -44,49 +48,69 @@ public class AuthController {
                     request.getEmail(),
                     request.getPassword()
             );
+
             return ResponseEntity.ok(token);
+
         } catch (Exception e) {
             return ResponseEntity.status(401).body(e.getMessage());
         }
     }
 
-    // ✅ FORGOT PASSWORD
+    // FORGOT PASSWORD
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> forgotPassword(
+            @RequestBody Map<String, String> request
+    ) {
+
         try {
+
             String email = request.get("email");
 
             if (email == null || email.isEmpty()) {
-                return ResponseEntity.badRequest().body("Email is required ❌");
+                return ResponseEntity.badRequest()
+                        .body("Email is required ❌");
             }
 
             String token = Jwts.builder()
                     .setSubject(email)
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                    .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
+                    .setExpiration(
+                            new Date(
+                                    System.currentTimeMillis() + 10 * 60 * 1000
+                            )
+                    )
+                    .signWith(
+                            SignatureAlgorithm.HS256,
+                            SECRET_KEY.getBytes()
+                    )
                     .compact();
 
-            String resetLink = "http://localhost:5173/reset-password?token=" + token;
+            String resetLink =
+                    "http://localhost:5173/reset-password?token=" + token;
 
-            String message = "Click the link to reset your password:\n" + resetLink;
+            String message =
+                    "Click the link to reset your password:\n" + resetLink;
 
             emailService.sendSOSMail(email, message);
 
             return ResponseEntity.ok("Reset link sent 📩");
 
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+
+            return ResponseEntity.status(400)
+                    .body(e.getMessage());
         }
     }
 
-    // ✅ RESET PASSWORD
+    // RESET PASSWORD
     @PostMapping("/reset-password/{token}")
     public ResponseEntity<?> resetPassword(
             @PathVariable String token,
             @RequestBody Map<String, String> request
     ) {
+
         try {
+
             String newPassword = request.get("password");
 
             String email = Jwts.parser()
@@ -97,10 +121,14 @@ public class AuthController {
 
             userService.updatePassword(email, newPassword);
 
-            return ResponseEntity.ok("Password reset successful ✅");
+            return ResponseEntity.ok(
+                    "Password reset successful ✅"
+            );
 
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Invalid or expired token ❌");
+
+            return ResponseEntity.status(400)
+                    .body("Invalid or expired token ❌");
         }
     }
 }
