@@ -4,8 +4,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import AddContact from "./pages/AddContact";
-import ForgotPassword from "./pages/ForgotPassword";
 import ManageContacts from "./pages/ManageContacts";
+import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -14,15 +14,13 @@ function App() {
   return (
     <BrowserRouter>
       <div style={container}>
-        
-        {/* 🔥 APP TITLE */}
+
         <div style={header}>
-          <h2 style={{ color: "#fff" }}>
+          <h1 style={title}>
             🚨 Girl Safety Alert System
-          </h2>
+          </h1>
         </div>
 
-        {/* 🔥 ROUTES */}
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -42,8 +40,6 @@ function App() {
 
 export default App;
 
-/* 🎨 STYLES */
-
 const container = {
   minHeight: "100vh",
   background: "linear-gradient(135deg, #0f172a, #1e3a8a)",
@@ -54,4 +50,9 @@ const header = {
   padding: "15px",
   background: "rgba(255,255,255,0.05)",
   backdropFilter: "blur(10px)",
+};
+
+const title = {
+  color: "#fff",
+  margin: 0,
 };
