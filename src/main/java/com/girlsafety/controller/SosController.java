@@ -16,23 +16,22 @@ public class SosController {
 
     private final SosService sosService;
 
-    @PostMapping("/send")
-    public String sendSOS(@RequestBody SosRequest request, Authentication authentication) {
+   @PostMapping("/send")
+public String sendSOS(@RequestBody SosRequest request,
+                      Authentication authentication) {
 
-        String email = authentication.getName();
+    System.out.println("Authentication = " + authentication);
 
-        return sosService.createSOS(
-                email,
-                request.getLatitude(),
-                request.getLongitude()
-        );
+    if (authentication == null) {
+        throw new RuntimeException("Authentication is null");
     }
 
-    @GetMapping("/my-alerts")
-    public List<SosAlert> getMyAlerts(Authentication authentication) {
+    String email = authentication.getName();
 
-        String email = authentication.getName();
-
-        return sosService.getUserAlerts(email);
-    }
+    return sosService.createSOS(
+            email,
+            request.getLatitude(),
+            request.getLongitude()
+    );
+}
 }

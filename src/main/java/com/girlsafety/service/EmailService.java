@@ -13,15 +13,25 @@ public class EmailService {
 
     public void sendSOSMail(String toEmail, String message) {
 
-    SimpleMailMessage mail = new SimpleMailMessage();
+        try {
 
-    mail.setFrom("bhukyagayathri2005@gmail.com"); // 🔥 ADD THIS LINE
-    mail.setTo(toEmail);
-    mail.setSubject("🚨 SOS ALERT");
-    mail.setText(message);
+            SimpleMailMessage mail = new SimpleMailMessage();
 
-    mailSender.send(mail);
+            mail.setFrom("girlsafetyalertsystem@gmail.com");
+            mail.setTo(toEmail);
+            mail.setSubject("🚨 SOS ALERT");
+            mail.setText(message);
 
-    System.out.println("Email sent successfully to: " + toEmail);
-}
+            mailSender.send(mail);
+
+            System.out.println("Email sent!");
+
+        } catch (Exception e) {
+
+            System.out.println("Email failed:");
+            e.printStackTrace();
+
+            // Don't throw the exception
+        }
+    }
 }
