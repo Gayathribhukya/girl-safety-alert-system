@@ -83,38 +83,46 @@ export default function Dashboard() {
   }, []);
 
   // 🚨 SEND SOS
-  const sendSOS = async () => {
+ const sendSOS = async () => {
 
-    if (!location.latitude || !location.longitude) {
-      alert("Location not ready ❌");
-      return;
-    }
+  console.log("SOS button clicked");
 
-    try {
+  if (!location.latitude || !location.longitude) {
+    console.log("Location not ready");
+    alert("Location not ready ❌");
+    return;
+  }
 
-      const token = localStorage.getItem("token");
+  try {
 
-      await API.post(
-        "/sos/send",
-        {
-          latitude: location.latitude,
-          longitude: location.longitude,
+    console.log("Sending request...");
+
+    const token = localStorage.getItem("token");
+    console.log("Token:", token);
+
+    const response = await API.post(
+      "/sos/send",
+      {
+        latitude: location.latitude,
+        longitude: location.longitude,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      }
+    );
 
-      alert("🚨 SOS Sent Successfully!");
+    console.log("Response:", response);
 
-    } catch (error) {
-      console.error(error);
-      alert("Failed to send SOS ❌");
-    }
-  };
+    alert("🚨 SOS Sent Successfully!");
 
+  } catch (error) {
+    console.log("ERROR:", error);
+    console.log("Response:", error.response);
+    alert("Failed to send SOS ❌");
+  }
+};
   // 🚪 LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
