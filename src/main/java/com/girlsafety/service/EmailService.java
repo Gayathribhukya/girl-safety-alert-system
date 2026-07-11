@@ -13,25 +13,32 @@ public class EmailService {
 
     public void sendSOSMail(String toEmail, String message) {
 
-        try {
+    try {
 
-            SimpleMailMessage mail = new SimpleMailMessage();
+        System.out.println("========== EMAIL DEBUG ==========");
+        System.out.println("STEP 1: Creating mail");
 
-            mail.setFrom("girlsafetyalertsystem@gmail.com");
-            mail.setTo(toEmail);
-            mail.setSubject("🚨 SOS ALERT");
-            mail.setText(message);
+        SimpleMailMessage mail = new SimpleMailMessage();
 
-            mailSender.send(mail);
+        mail.setFrom("girlsafetyalertsystem@gmail.com");
+        mail.setTo(toEmail);
+        mail.setSubject("🚨 SOS ALERT");
+        mail.setText(message);
 
-            System.out.println("Email sent!");
+        System.out.println("STEP 2: Calling mailSender.send()");
 
-        } catch (Exception e) {
+        mailSender.send(mail);
 
-            System.out.println("Email failed:");
-            e.printStackTrace();
+        System.out.println("STEP 3: Email sent successfully!");
 
-            // Don't throw the exception
-        }
+    } catch (Exception e) {
+
+        System.out.println("STEP 4: Email failed!");
+        e.printStackTrace();
+
     }
+
+    System.out.println("========== END EMAIL DEBUG ==========");
+}
+
 }
