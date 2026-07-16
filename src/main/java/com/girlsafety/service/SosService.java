@@ -22,10 +22,14 @@ public class SosService {
     private final EmailService emailService;
 
     // CREATE SOS ALERT
-   public String createSOS(String email, double latitude, double longitude) {
+  public String createSOS(String email, double latitude, double longitude) {
+
+    System.out.println(">>> createSOS() started");
 
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
+
+    System.out.println(">>> User found: " + user.getEmail());
 
     SosAlert alert = SosAlert.builder()
             .user(user)
@@ -37,51 +41,34 @@ public class SosService {
 
     sosRepository.save(alert);
 
-    // Create Google Maps link
+    // Google Maps link
     String mapLink = "https://maps.google.com/?q=" + latitude + "," + longitude;
 
-   String message =
-    "🚨 EMERGENCY ALERT 🚨\n\n" +
-    "User: " + email + "\n" +
-    "Time: " + LocalDateTime.now() + "\n\n" +
-    "⚠️ I am in danger. Please help immediately!\n\n" +
-    "📍 Live Location:\n" + mapLink + "\n\n" +
-    "👉 Click the link to track location.";
+    // Message
+    String message =
+            "🚨 EMERGENCY ALERT 🚨\n\n" +
+            "User: " + email + "\n" +
+            "Time: " + LocalDateTime.now() + "\n\n" +
+            "⚠️ I am in danger. Please help immediately!\n\n" +
+            "📍 Live Location:\n" + mapLink + "\n\n" +
+            "👉 Click the link to track location.";
 
     List<EmergencyContact> contacts = contactRepository.findByUser(user);
 
-   for (EmergencyContact contact : contacts) {
+    System.out.println(">>> Number of contacts: " + contacts.size());
 
-    // EMAIL (only if valid)
-   if (contact.getEmail() != null && !contact.getEmail().isEmpty()) {
-    System.out.println("📧 Sending email to: " + contact.getEmail());
-    emailService.sendSOSMail(contact.getEmail(), message); // ✅ FIXED
-}
+    for (EmergencyContact contact : contacts) {
 
-    // SMS (only if valid)
-    //String phone = contact.getPhone();
+        System.out.println(">>> Contact email: " + contact.getEmail());
 
-   // if (phone == null || phone.isEmpty()) {
-      //  System.out.println("⚠️ Skipping invalid phone");
-       // continue;
-   // }
+        if (contact.getEmail() != null && !contact.getEmail().isEmpty()) {
 
-    // format fix
-   // if (!phone.startsWith("+91")) {
-    //    phone = "+91" + phone.replaceFirst("^0+", "");
-    //}
+            System.out.println("📧 Sending email to: " + contact.getEmail());
 
-    //smsService.sendSMS(phone, message);
-
+            emailService.sendSOSMail(contact.getEmail(), message);
+        }
     }
-    return "SOS Alert Sent Successfully"; // ✅ FIX
-}
-// GET USER ALERT HISTORY
-public List<SosAlert> getUserAlerts(String email) {
 
-    User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-    return sosRepository.findByUser(user);
+    return "SOS Alert Sent Successfully";
 }
 }

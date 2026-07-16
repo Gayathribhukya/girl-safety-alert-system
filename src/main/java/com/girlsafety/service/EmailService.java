@@ -23,12 +23,15 @@ public class EmailService {
 
             SimpleMailMessage mail = new SimpleMailMessage();
 
+            // Sender email (same as Gmail SMTP username)
             mail.setFrom(fromEmail);
+
             mail.setTo(toEmail);
             mail.setSubject("🚨 SOS ALERT");
             mail.setText(message);
 
-            System.out.println("Sending email to: " + toEmail);
+            System.out.println("From: " + fromEmail);
+            System.out.println("To: " + toEmail);
 
             mailSender.send(mail);
 
@@ -38,7 +41,6 @@ public class EmailService {
 
             System.out.println("❌ Email failed!");
             e.printStackTrace();
-
         }
 
         System.out.println("========== EMAIL END ==========");
