@@ -1,6 +1,7 @@
 package com.girlsafety.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -11,34 +12,35 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+
     public void sendSOSMail(String toEmail, String message) {
 
-    try {
+        System.out.println("========== EMAIL START ==========");
 
-        System.out.println("========== EMAIL DEBUG ==========");
-        System.out.println("STEP 1: Creating mail");
+        try {
 
-        SimpleMailMessage mail = new SimpleMailMessage();
+            SimpleMailMessage mail = new SimpleMailMessage();
 
-        mail.setFrom("girlsafetyalertsystem@gmail.com");
-        mail.setTo(toEmail);
-        mail.setSubject("🚨 SOS ALERT");
-        mail.setText(message);
+            mail.setFrom(fromEmail);
+            mail.setTo(toEmail);
+            mail.setSubject("🚨 SOS ALERT");
+            mail.setText(message);
 
-        System.out.println("STEP 2: Calling mailSender.send()");
+            System.out.println("Sending email to: " + toEmail);
 
-        mailSender.send(mail);
+            mailSender.send(mail);
 
-        System.out.println("STEP 3: Email sent successfully!");
+            System.out.println("✅ Email sent successfully!");
 
-    } catch (Exception e) {
+        } catch (Exception e) {
 
-        System.out.println("STEP 4: Email failed!");
-        e.printStackTrace();
+            System.out.println("❌ Email failed!");
+            e.printStackTrace();
 
+        }
+
+        System.out.println("========== EMAIL END ==========");
     }
-
-    System.out.println("========== END EMAIL DEBUG ==========");
-}
-
 }
